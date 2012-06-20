@@ -1,0 +1,1190 @@
+EE
+可见行：
+由于lua都之在run-time 
+So If a function reference a func A, it much
+can seeable the functionA.
+
+
+EE difference
+f ; f =function() print(type(f)) end
+f()
+$: function
+
+local  f =function() print(type(f)) end
+f()
+$: nil 
+
+EE 
+in Lua nil and false is false.
+if 0 then -- 0 is not false
+	print("0 == false")
+end
+
+if nil then
+	print("0 == false")
+end
+
+config_name="ff.x"
+config_value=100
+
+table = {name="Evan", age=20}
+EE 范性for， pairs 输出所有table中的 key-value pair
+EE ipairs 只输出table中的 key is number de key-value pair 从key为1开始，直到遇见key=nil
+EE 输出的顺序是按内部储存的顺序，而不是定义的顺序
+for k, v in pairs(table) do
+	print(k, v)
+end
+
+function add(x, y)
+	return x + y
+end;
+
+范性For 的语义
+for <var-list> in <exp-list> do
+  <body>
+end
+for 初始化:
+var-list 中的第一个变量为控制变量，在迭代中不会为nil，因为为nil是loop 结束。
+For 做的第一间事就是对 in 后面的表达式求职。
+exp-list for之保存前3个从exp-list 返回的值。
+迭代器函数，恒定值（table），控制变量的初值（var-list 中的第一个变量）
+内部保存了迭代器函数，每次迭代
+调用IterFunc，并在IterFunct 返回nil是结束
+
+Next: 
+用恒定值和控制变量来调用迭代函数
+在用返回的值赋值var-list
+
+
+for var1, var2, ... aa(t)
+same as
+do
+local _f ,_s ,_var = aa(t)
+    while true do
+	local var1, var2,... = _f(_s, _var)
+	_var =  _var1
+	if _var == nil then break end
+	<body>
+    end
+end
+
+
+EE
+local 
+在文件block中的local 这能在本文件中被看到，
+即使使用require 导入的一个A文件，也不能看到
+A从的local virable 
+
+EE
+'table.sort'：takes an array and sort it in place .(not return new array)
+use < compare
+can give a 'comparison function' as second argument to table.sort
+'comparison function' takes two arguments and return true if and 
+only if its first arguemnt should come before its second argments
+
+EE
+'table.insert'
+useg: table.insert(table, x)
+    inset 从1下标开始，逐个插入
+is same as table[#table + 1] = x
+还可以指定一个插入下标
+useg: table.insert(table, index, x)
+
+EE
+'table.remove'
+return: return the element it just removed
+默认从[#table]移除
+usage: tablet.remove({1,2,3})
+还可以指定一个remove下标
+useg: table.insert(table, index, x)
+
+注： insert 和 remove 可以不用保持连续，但是
+#操作符会从1开始遇见nil就结束。
+
+EE
+'table.concat' :concatenates an array of
+string or number elements all into one string
+usage: print(table.concat({"a", "b", "c"}))
+还可以输入第二个参数作为分隔符
+usage: print(table.concat({"a", "b", "c"}, "|"))
+还可以输入第三，四参数作为链接的下标
+usage: print(table.concat({"a", "b", "c"}, "|", 2,3))
+
+EE
+当只穿第给函数一个参数时 可以不用括号括参数
+e.g
+print {}
+
+EE
+'oo' 
+给予table
+--[[
+--使用do可以形成一个作用于，可以使得func似有化
+do
+    local function Get(obj)
+	print(obj.N)
+    end
+
+    local function Inc(obj, M)
+	obj.N  = obj.N + M
+    end
+
+    --not a local func
+    function MM(n)
+	return {N = n, Get = Get, Inc = Inc, ss =ss}
+    end
+end
+
+x=MM(3);
+x:Inc(10); --same as x.Inc(x, m)
+
+--另一个使用self
+--只有table有self
+do 
+    --T is only used as a container
+    local T = {}
+
+    --this function neither local nor global they are field of a table
+    -- T:SS()
+    function T.SS(self)
+	print(self.N .. "ss")
+    end
+
+    --self
+    -- T.Get(self)
+    function T:Get()
+	--self same T
+	print(self.N)
+    end
+
+    function T:Inc(m)
+	self.N = self.N + m
+    end
+
+    --constructor function
+    function S1(n) 
+	return {N=n, Get = T.Get, Inc = T.Inc, SS = T.SS}
+    end
+end
+
+x2 = S1(4)
+--same as xx2.Get(xx2)
+x2:Get()
+
+EE 类系统
+可以使用元表的__index 来是多个变量有一个相同的原型
+setmetatable(a, {__index = proto})
+
+EE
+'keyword arguments'
+就是关键字参数，给一个函数传递的参数不和位置相关（先后顺序）而是
+和关键字相关
+
+sort({key1 = v1, key2 = v2})
+由于是一个table所以可以不写（）
+sort{key1 = v1, key2 = v2}
+
+
+EE 
+分清table的copy和reference
+copy a table
+function tCopy(t)
+    local new = {}
+    --copy table
+    for k, v in pairs(t) do
+	new[k] = v
+    end
+    return new  --return the reference of new
+end
+
+EE
+deep copy , like c++
+
+
+//////////String function
+EE
+'string.lower'
+'string.upper'
+usage: string.lower(xx)
+    both func are not side effect.
+    because string is immutable.
+    there returen value
+
+EE
+'string.rverse'
+reverse a string (str)
+
+EE
+'string.rep'
+takes a string and a number, and
+repeats the string that many times
+e.g.
+print(string.rep("ab",2))
+abab
+
+EE
+'string.sub'
+get sub string
+takes three argumetns,
+      first is string,
+      second is the index of first characters of substring in string
+      thired is the index of last  characters of substring in string
+
+      if sub's last argument is omitted, it defaults to -1
+e.g str = "abcdefg"
+print(string.sub(str, 1,3))
+    abc
+print(string.sub(str, -3, -1))
+    efg
+
+EE
+'string.len'
+like #
+
+EE
+'string.byte'
+return character asiic code
+e.g
+print(string.byte("ABC", 1, 2))
+second and third is begin and end of speco
+
+EE
+'string.format'
+like C print stely
+usage: 
+C   printf("%s %-10d %.2f", "str", 3, 3.334)
+Lua print(string.format("%s, %-10d", "str", 3))
+
+--EE also can use [[ ..,. ]] formaat string
+也可以使用[[ ]]阔起来格式化
+-- not need "
+print(string.format([[
+-->%5.0f<-- width: 5; pre : 0
+-->%5.1f<-- width: 5; pre : 1
+-->%5.2f<-- width: 5; pre : 2]], 9.33,9.33,9.33 ))
+
+%a(letters)
+%u(uppercase)
+%l(lowercase)
+%D(any character that isn't a digit)
+%L(any character that isn't a lowercase)
+%A(any character that isn't alphabetical)
+%q placeholder ,期待一个字符串，而字符串中的双引号，\,newline 
+都会适当的转义
+主要用于生产代码
+loadstring(string.format("return %q", ""aa"))
+
+EE
+'string.gsub'
+searchs its first argument for substings that
+    match the patten given a second argument,
+    and replaces any that it finds with its 
+    third argument.
+e.g
+print(string.gsub("hello word", "word", "world"))
+
+return two value first is substibutin string(支持正则表达式）
+		second is the number of substitutions
+if a fourth argument is given, then at most
+the many substitutions are dnoe(最多替换几次)
+
+e.g
+print(string.gsub([[patches/"  oo]], "^patches/", "", 1))
+print(string.gsub("feddoo fef", "%.png$", "", 1))
+print(string.gsub("12-34,334/2-22", "[/,.-]", ""))
+!!!!!!!!!!!
+print(string.gsub(Obj, "[^%w%p ]", function(Ch) ---把Ch转化成对应的ascii
+                  return "\\" .. string.format("%03d", string.byte(Ch)) end ))
+上面的第三的参数是个函数，在有匹配时会被调用 (ch)就算匹配的字符穿,
+匹配几次就会调用几次。
+在匹配magiccharaect是，与要使用% 
+.e.g %"%[%%  match "[%
+
+Magic Characters Chart:
+% Escapes the magic character that follows it
+. Matches any character
+%A, %C, %D, etc. Matches any character not matched by %a, %c, %d, etc.
+%a Matches a letter
+%c Matches a control character
+%d Matches a decimal digit
+%l Matches a lowercase letter
+%p Matches a punctuation character // all of symbol excpte whitespace 
+%s Matches a whitespace character
+%u Matches an uppercase letter
+%w Matches a word character (a letter or a number)
+%x Matches a hexadecimal digit
+%z Matches a “\0” character
+[abc] Matches a, b, or c
+[A-Ea-e%d] Matches A through E, a through e, or a digit
+[^abc] Matches any character other than a, b, or c
+* Makes the preceding character class match zero or more characters (greedy)
++ Makes the preceding character class match one or more characters (greedy)
+- Makes the preceding character class match zero or more characters (nongreedy)
+? Makes the preceding character class match zero or one character(s) (greedy)
+^ Anchors the pattern at the beginning
+$ Anchors the pattern at the end
+%1, %2, etc. Matches the first capture, second capture, etc. (up to 9)
+%b(), %b<>, etc. Matches balanced parentheses, angle brackets, etc.
+%f[%a_], %f[^AEIOUaeiou], etc. Undocumented — matches the empty string (“frontier”) at
+                                    the transition from something not matched by the given
+                                   bracket class to something matched by it.
+
+的站位符
+%s(matches a whitespace charactor("\t", \n, \v...)
++ zero or more characters,as many as possible
+* one  or more characters,as many as possible
+- zero or more characters,as less as possible
+? zero or one characters,as less as possible
+
+EE
+'string.find'
+return the positions of the first and last character
+of the first macth
+e.g
+print(string.find("duck duck goose", "duck"))
+1 4
+THIRD ARG: can given third arument, which is a number
+that specifyies which character of the subject to 
+start the search at. (从地几个字符开始搜索)
+e.g start from c
+print(string.find("duck duck goose", "duck", 3))
+FOURTH ARG: can given fourth argument is true,
+it will ignore the magic meanings of characters in 
+the second argument
+e.g
+print(string.find("magic c is %^", "%^", 1, true))
+
+EE
+'string.match'
+...
+
+EE
+'string.dump(function)'
+Returns a string containing a binary representation 
+of the given function, so that a later load on this 
+string returns a copy of the function (but with new upvalues).
+
+
+--IO most I/O lib functions will return nil and 
+an error string if someting unexpected happens
+EE
+'io.read()'
+reads (by default) on line of input
+
+EE
+'io.liens(filenaem)'
+is an iterator factory. return an iterator(function)
+that loops through all lines in the file
+if not argument return an standard input 
+e.g //output file
+local iter = io.lines("test1.lua")
+for ll in iter do
+    print(ll)
+end
+
+EE 
+ERROR And Handle
+lua的错误基本上在运行是才会发现，所与一定要测试Lua代码。
+
+EE
+lua 的默认处理错误行为
+print message followed by a stack trackback and 
+then to terminate the program
+也就意味着他在终结自己时，不会关闭以打开的File despriteor
+socket and may not have been flushed buffer, system resources
+may not be freed in a timely or consisitent manner.
+
+EE
+'assert'
+usage: assert(expr, "some_message")
+nil and false both can make assert fail
+return: if the first argument neither false nor nil
+the assert returns every argument that was passed in.
+e.g.
+assert(3 > 4, "assert failed")
+
+EE
+'error'
+error(message [, level])
+usaeg: 生成错误强制终结程序
+level 是报告产生error的地点，
+defulat 1 就是调用error的函数，2上一曾
+never returns
+e.g.
+error("ERROR ....");
+
+EE
+anticipating Error Conditions
+就是容错
+比如要写一个三个参赛相加的函数，当不能使相加时提供容错。
+function Fnc(a b c)
+    local a, b, c = tonumber(a), tonumber(b), tonumber(c)
+    --x y z are local virable
+    --and 和 or的应用使得下面的代码对任何输入都不会产生错误
+    print(a and b and c and a + b +c
+	    or "expected")
+end
+
+返回错误
+是的任何函数返回两个值，第一个是正确的答案，第二个是错误的信息
+如果第一个为nil，则表示函数出错，可以通过第二个return value
+get error message
+e.g
+function Fnc(a b c)
+    local sum, errMsg; -- both nil
+    if a and b and c then
+	sum = a + b + c
+    else
+	errMsg = "bad input"
+    end
+    return sum, errMsg
+end
+
+EE
+'保护环境'
+A mechanism be avoide terminal progream then a error occusioned
+
+EE 'pcall'
+pcall(function-name, arumetns...)
+pcall提供了保护环境，当一个错误发生是不再是终结程序，而是
+pcall返回错误信息(出现错误立即返回)
+return: pcall返回两个结果，
+    1bool value： treu 执行的代码没有错误, false 反之
+    2string : 如果有错误返回错误信息
+function pp()
+    error("wori")
+end
+local a , b =pcall(pp)
+print(a, b)
+
+$:false  wori....
+
+EE
+'xpcall'
+just like pcall
+have tow differs:
+1. It uses an error handler. second argument
+
+EE
+模块的使用
+模块的搜索路径：
+由package.path variable 指定
+
+环境变量LUA_PATH 可以specify路径
+对用5.2 使用LUA_PATH_5_2 specify paht
+1.
+
+EE 'package.cpath. 
+search for a C loader path
+对用5.2 使用LUA_CPATH_5_2 specify paht
+
+EE
+'require'
+a function that affect in run-time nor comiler-time
+usage: like include in C 参数是你需要引入的文件名
+（source code andd Lua bytecode)
+return: true is load successed.
+e.g
+require("common") 注意不需要.lua 后赘名
+注意在层次的require 调用下 当前目录为首次调用
+require 的目录
+
+当多次require同个pake时之require一次，
+require首先从package.loaded table 中查找
+如果没有在加载, 所以可以通过修改package.loaded
+屏蔽有些包的实际加载
+e.g 
+package.loaded["ok"]=true; --其实ok并没有真的加载过
+print("requie ok ", require("ok"));
+$: require ok true
+
+require 的返回值，是依赖于loder的
+如果loder返回了值，那么就把这个之存到loaded[filename]
+中，在返回loaded[filename]的值，如果loader没有返回
+就村true给loaded
+
+自己不能(require)加载自己
+
+EE
+'package.loaded'
+a table that store the loaded modules
+is loaded value is true. or nil
+
+EE
+'bytecode‘
+编译成bytecode，lua可以让多个lua文件便以为一个
+bytecode文件
+luac: 
+lua 的编译器
+luac -l 打印出bytecode细节信息 
+     -l -l more info
+     -p 不生成之检测语法
+     [x] 地x行
+     slots, 表示使用了几个registers
+     每一行第4列有有几个数字：第一个是使用的register，
+lua VM 有250 registers,
+lua 通过MagicNumber来识别是srouce file还是bytecode file
+如果第一个byte是27则就是bytecode。
+
+
+
+EE
+namespace
+通常一个模块应该创建一个namespace table and
+place its function and other variables in it.
+好处避免与全局环境有同名冲突
+
+在模块文本中建立一个local table
+所有的interface都是这个table的elements
+return table
+e.g
+local Util = {}
+function Util.Quote(Str)
+    return string.format("%q", Str)
+end
+return Util
+
+EE
+'module' 5.2 中好像没有使用_ENV 机制定义
+a function that can modularize a Lua script.
+creating a namespace table and effectively
+placing all globla variable into this table
+使所以的全局对象不可访问
+e.g
+module(spaceName);
+由于module后无法访问_G,要使得可以访问_G使用
+module(spaceName, package.seeall);
+
+
+EE Metatable 
+Lua 中每一个value中都可以有Metatable
+table 和 userdata有个字的Metatable 而其他类型
+的值则共享其类型的Metatable。
+默认，一个table dose not have a metatable.
+Metatable de key is well-know index
+value is a function
+检测Metatable的,如果第一个参数没有，就找第二个
+以次下去。。与操作符的结合行有关
+
+在lua中只能设置table的Metatable，其他类型的Metatable需要通过
+C接口来完成
+
+EE
+'setmetatable' function
+设置一个table 的metatable
+e.g
+setmetatable(aa, mt)
+EE
+'getmetatable' function
+得到一个value的Metatable
+return nil，没有
+e.g
+mt = getmetatable(aa)
+
+
+table metamthos
+内置元index
+___concat ..
+__add +
+__sub -
+__mul *
+__div /
+__unm (unary minus) -
+__pow ^
+__mod %
+__len #(len)
+__eq = 只会在连个都是userdata，or table, or 不是
+__lt 小于
+__le 小于等于
+__tostring tostring
+__index   talbe[] 
+__index 不仅可以是方法，也可以是table
+当是table是就以key查询此table
+__newindex table【】赋值 e.g a.e=3 ,a[x]=4
+When Lua sees Ta.abc = 1, it checks to see
+whether Tb already has an abc filed. It dosen't
+then find if have __newindex metamethod.
+只用当key不是table是可肯会调用__[new]index
+useage: __newindex(table, key, val)
+	__index(table, key)
+__call controls what happens when something
+other than a fucntion is called
+__metatable 保护元表
+用户及不能看见也不能修改，设置__metatable
+e.g
+mt.__metatable = "not your business"
+
+if a table has a metatalbe whose __mode field
+is a string "k" 当table的key没有外部引用时
+会删除掉这个key-value pair。
+if __mode field is a "v", 当table的value
+没有外部引用时会删除掉这个value 
+虚引用的用途就是实现备忘录，只要么有外表引用
+只有储存的table则这个obj会被回收。
+上面情况知会对除number,string,boolean,类型
+以外的值有效。
+删除后的key和value称为虚key和虚value(week)
+
+
+EE mt.__gc 
+方法是lua回收的除了函数。一般userdata会指定
+一个_gc 方法来回收自己
+
+
+number metamethods
+不像table，userdate其他类型的value共享一个metatable
+并且要用debug.setmetatable,来设置。
+
+userdate Metamethods
+每一个userdate都可以有他自己的metatable
+
+EE
+'rawset''rawget'
+由于talbe索引是会有可能待用__index 元方法，
+如果不想调用就可使用 rawset and rawge
+
+encapsulation  封装
+export interface and change the implementation
+
+EE coroutine
+A Coroutine is not a function.
+1. unlicke func, a coroutine must be specially prepared.
+or instantiated, before it can be actived. you use the
+coroutine.create function to do this.
+2. every coroutine has its own call stack 
+3. only one will be currently running. 
+
+EE
+'coroutine.create'
+Creates a new coroutine, with body f.
+f must be a Lua function. Returns this new coroutine, 
+an object with type "thread". 
+
+print(type(coroutine.create(main)))
+    thread
+
+EE 'coroutine.resume'
+调用一个coroutine 
+coroutine.resume(xx)
+
+'coroutine.yield(...)
+放弃控制返回调用他的thread
+只有coroutine 可以调用
+...return to resum
+
+EE 'coroutine.wrap(f)'
+Creates a new coroutine, with body f. 
+f must be a Lua function. Returns a function 
+that resumes the coroutine each time it is called
+
+print(type(coroutine.wrap(main)))
+    function
+
+EE
+'coroutine.status(c)'
+return a coroutine status
+
+EE
+'coroutine.running'
+Returns the running coroutine plus a boolean, 
+true when the running coroutine is the main one. 
+返回他自己，和一个boolean值。 主线程时是true
+
+EE
+'collectgarbage(waht [,data])'
+控制垃圾回收的行为
+
+EE int lua_gc(L, int what, data)
+和collectgarbage 相同 lua C的借口
+
+what 指定要做什么事：
+LUA_GCSTOP("stop") 停止回收器
+LUA_GCRESTART("restart")
+LUA_CGCOLLECT("collect") 执行一轮完整的垃圾回收周期
+
+
+EE 'os.time([time.table])
+返回一个一秒为单位的值，从一个指定时间开始到现在passed秒数
+
+EE
+'lua_type(L, index)'
+Returns the type of the value in the given acceptable index,
+or LUA_TNONE for a non-valid index. 
+The types returned by lua_type are defined in lua.h: 
+LUA_TNIL, 
+LUA_TNUMBER, 
+LUA_TBOOLEAN,
+LUA_TSTRING, 
+LUA_TTABLE, 
+LUA_TFUNCTION, 
+LUA_TUSERDATA,
+LUA_TTHREAD,
+LUA_TLIGHTUSERDATA.
+
+EE 'lua_typename(L, int tp)
+return const char *
+tp 的类型名， tp必须是lua_type 的返回值
+
+----Lua Bind
+1 Lua 和特语言的交互是通过一个virtual stack。交换变量
+    实现的。VS 是lua管理的. stack 上的每个元素都是lua值
+2. 无论何时 Lua 调用 C，被调用的函数都得到一个新的栈，
+    这个栈独立于 C 函数本身的堆栈，也独立于以前的栈。
+    （译注：在 C 函数里，用 Lua API 不能访问到 
+3 Lua 状态机中本次调用之外的堆栈中的数据）
+    它里面包含了 Lua 传递给 C 函数的所有参数，
+    而 C 函数则把要返回的结果也放入堆栈以返回给调用者(lua_CFunction）。 
+
+4.lua 不会持有外部的指针，push进来的值都会有一个lua的本地copy
+
+lua 提供了大量的操作VS的C 函数。来支持lua与其他语言
+的交互。
+index 1 是最先push进去的值，在stack bot。
+-1是最后一个push进去的值在stack top
+
+EE 调用lua scripts 从C中
+需要 使用lua_newstate() 建立和初始化
+一个Lua state. 在使用返回的lua_State handl
+作为参数调用LUA API
+
+EE
+typedef int (*lua_CFunction) (lua_State *L)
+这个既可以导出一个函数，被lua调用
+
+EE
+lua_is*(lua_State *, index)
+return 1 是你想要的类型，0不是
+
+EE
+lua_to*(lua_State *L, index)
+返回一个转换的对象。
+
+EE lua_tolstring(L, index,  size_t *len)
+1把给定索引处的 Lua 值转换为一个 C 字符串。
+    如果 len 不为 NULL ，它还把字符串长度设到 *len 中。
+2.一个字符串或是一个数字；否则返回返回 NULL 。
+    如果值是一个数字，lua_tolstring 还会把堆栈中的那个值的
+    实际类型转换为一个字符串。
+3. lua_tolstring 返回 Lua 状态机中字符串的以对齐指针。
+4. 返回的string以('\0')结尾，但是string从肯会有零。
+5. Lua 中可能发生垃圾收集，所以不保证 lua_tolstring 返回的指针，
+在对应的值从堆栈中移除后依然有效。 
+
+EE lua_tostring(lua_State *L, int index);
+eq lua_tolstring(L, index, NULL)
+
+EE 'lua_objlen' renamed lua_rawlen(L, index) in 5.2
+
+EE
+luaL_check*(lua_State *L, int index)
+是lua_to*的功能加上类型检测,可以输出有效的错误信息
+比lua_is* + lua_to*,更好些
+不会弹出index
+
+EE luaL_checktype(L, int p, type)
+检查p是否是类型type
+
+
+EE 'lua_gettop(lua_State *L)
+int lua_gettop (lua_State *L);
+    Returns the index of the top element in the stack.
+    Because indices start at 1, this result is equal to the
+    number of elements in the stack 
+    (and so 0 means an empty stack). 
+
+EE 'lua_settop(L, index)
+int lua_gettop (lua_State *L);
+    Returns the index of the top element in the stack. 
+    Because indices start at 1, this result is equal to 
+    the number of elements in the stack 
+    (and so 0 means an empty stack). 
+
+EE 'lua_pop();
+    void Pops n elements from stack
+
+EE 'lua_pushlstring（L，const char *s, size_t len)
+lua 中的字符串不已'\0'结尾,需要知名长度
+
+EE 'lua_pushstring(L, const char *c_str)
+c_str必须要以0结尾
+
+EE 'lua_pushvalue'
+    把栈中指定索引的元素复制一份push to top
+    copy indix ele and push 
+
+EE 'lua_replace'
+    void lua_replace (lua_State *L, int index);
+    Moves the top element into the given position 
+    without shifting any element 
+    (therefore replacing the value at the given 
+     position), and then pops the top element. 
+    把top move to index.
+    lua_replace(L, -1) == lua_pop()
+    在replaces pop后有效的index已经改变
+EE 'lua_remove(L, index)'
+    move the specify index element
+EE 'lua_insert(L, index)'
+不删除vs中的任何之
+    move top element to index
+    lua_insert(L, -1) is noeffect
+    
+EE 'lua_getfield(L, index, const char *key)'
+把到指定index table中的key的值push on VS
+会出发table的元方法!
+是lua_gettable 的 key=string的特化版本
+lua_pushvalue(L, key); lua_gettable(L, -2);
+== lua_getfield(L, -1, key);
+
+EE 'lua_gettable(L, index)'
+得到一个table中的值，
+index 是这个table在VS中的有效索引，key 默认在
+VS 的top，在得到这个t[key]后，把key pop out，
+在把t[key] push on, 等于是t[key] replase key
+这个操作可以trigger table metametch
+VS top
+key -> value
+
+
+EE 'lua_settable(L, index)'
+设置table的t[k] = valule
+index 是table所在的VS的index
+VS top
+value
+k  
+.
+.
+然后会pop value 和key。
+会出发__nexindex
+
+EE 'lua_setfield(L, index, const char *k)'
+以strng为key的lua_settable 的特化版本
+lua_pushnumber(L, 3) //push value
+lua_setfield(L, -2, "hh") 
+== lua_pushstring(L, "hh")
+   lua_pushnumber(L, 3)
+   lua_settable(L, -3);
+
+EE lua_rawget(L, index); 
+不调用元方法的lua_gettable
+
+EE  lua_rawset(L, index)
+不调用元方法的lua_settable
+
+
+EE
+int  lua_checkstack (lua_State *L, int extra);
+    确保堆栈上至少有 extra 个空位。如果不能把堆栈扩展到相应的尺寸，函数返回 false 。这个函数永远不会缩小堆栈。
+
+--lua
+EE 'luaL_Reg' 
+需要注册到lua的C函数的引用和注册的func
+.e.g
+static const luaL_reg funcs[] = {
+    {"referenceTheFuncNameInLua", CFunctionName},
+    {NULL, NULL}// must with this end
+};
+
+// lua API 的错误处理机制
+EE 'lua_atpanic(L, lua_CFunction)'
+lua 遇到错误时就会调用此中注册的func然后终止
+作用和C中的atexit 相同
+不是所以的luaAPI 都会抛出异常
+
+EE 'lua_newtable(L)
+create a new empty table and pushes it onto
+stack. == lua_createtable(L, 0, 0)
+
+EE void lua_createtable (L, int narr, int nrec);
+Creates a new empty table and pushes it onto the stack. 
+Parameter narr is a hint for how many elements the table will have as a sequence; 
+parameter nrec is a hint for how many other elements the table will have. 
+Lua may use these hints to preallocate memory for the new table. 
+This pre-allocation is useful for performance when you know in advance 
+how many elements the table will have.
+Otherwise you can use the function lua_newtable. 
+
+EE 'lua_error(L)'
+
+
+EE 'setglobal(L, const char *name);
+pop a value(top) from VS and set a global name
+
+EE 'getglobal(L, const char *name);
+把lua中的指定name变量push on到VS 上
+如果没有这个值就会push nil
+
+//////////////////lua call C/C++
+1调用的函数都必须是LuaCFunct
+2 在使用之前需要注册要调用的函数
+3每个调用的函数都有一个私有VS
+4 调用一个cFunc返回后lua会自动清除返回值以后的VS
+
+EE 'void lua_pushcfunction(L, lua_CFunction f)'
+注册CFunc. push the f func onto VS. 在VS 上的
+是lua的function值类型，每当之隔f被调用就会调用
+匹配的Cfunc
+他只是一个没有upvalues 的 closure
+其实是调用的这个 lua_pushcclosure(L, f, 0)
+
+EE 'luaL_setfuncs'
+void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup)
+注册l中所有的函数到一个table中，on the top of the stack
+When nup is not zero, all functions are created 
+sharing nup upvalues, which must be previously 
+pushed on the stack on top of the library table. 
+These values are popped from the stack after the 
+registration.
+** set functions from list 'l' into table at top - 'nup'; each
+** function gets the 'nup' elements at the top as upvalues.
+** Returns with only the table at the stack.
+
+
+每一个C模块编译成连接库，
+在lua中require “modename”
+没个C模块中都需要一个名为luaopen_modename 的函数。
+在lua require 一个C 模块后会自动执行 luaopen_modename
+的函数，在该函数中，需要注册此模块的函数
+.e.g. //file stacklook.so
+int luaopen_stacklook(lua_State *L)
+{
+    static const luaL_Reg Map[] = {
+	{"StackLook", StackLook},
+	{NULL, NULL}
+    };
+    luaL_setfuncs(L, Map, 0);
+    return 1;
+}
+
+////////////////// C/C++ call lua
+1当Lua调用C函数的时候，同样使用栈来交互。
+2C函数从栈中获取她的参数，调用结束后将结果放到栈中，
+  并返回放到栈中的结果个数.
+
+使用dofile，dostirng，dobuffer
+
+EE dofile
+
+EE C 模块
+Lua 调用CFunc 时并不依赖于函数名，包的位置或可就规则
+之依赖有注册是传入的函数地址。
+C 模块中只有一个外表可见函数用于创建C模块，其他
+所有函数都是私有的(static).
+注册函数以luaopen_开通，后跟模块的名字
+如果自持动态链接，就把C模块编译为so，然后使用require
+从lua加载模块
+require "mylib"
+这句话会将动态库链接到Lua，并会寻找luaopen_mylib函数
+，将其注册为一个lua函数，然后调用他打开模块.
+
+2如果不支持动态链接，就需要把模块和lua重新编译，具体
+咋搞不知道？？
+
+EE 'lua_register(L, const char *name, lua_CFunction f);
+Sets the C function f as the new value of global name.
+It is defined as a macro:
+#define lua_register(L,n,f) \
+    (lua_pushcfunction(L, f), lua_setglobal(L, n))
+
+EE 'luaL_register' 
+lua5.2中没有了，使用luaL_setfuncs 代替
+在 lua中require 时指定一个table来得到require 返回的lib
+.e.g
+clib = require "clib"
+clib:xxx
+
+
+调用一个lua function
+1. push function on the stack
+2. push arguements left to right on the stack
+3Call lua_call with the state pointer, the number of arguments you have just pushed, and the
+number of results to receive from the called function.
+EE 'lua_call (lua_State *L, int argsCount, int returnCount);
+void return
+
+当调用完成，所以调用函数是push入的值都会被自动弹出，
+stack中只会push on需要返回的值
+
+EE 'lua_getglobl(lua_State *L, const char *name);
+把lua中的全局变量name push 到VS中
+
+EE 'lua_pcall'
+int lua_pcall 
+(lua_State *L, int nargs, int nresults, int msgh);
+参数个数，返回的个数， msgh is 个错误信息的处里
+函数，如果为0,就返回原始的error msg，msgh还可以是
+一个VS中的index指向一个errormsg 处理函数。
+最终的error msg 是msgh 的返回值
+调用时VS的内容是 top 
+arg2
+arg1
+funcname
+lua_pcall(L, 2, 1, 0);
+2个参数，1个返回，
+返回的值都会压在vS中，而参数和函数名会自动弹出
+如果有错误会返回一个error code 并且会在VS中压如 
+一个错误信息string。
+                    
+EE 'lua_rawgeti'
+void lua_rawgeti (lua_State *L, int VSindex, int n);
+对table是数组操作的特化'
+Pushes onto the stack the value t[n], where t is the table 
+at the given valid index. The access is raw; 
+that is, it does not invoke metamethods. 
+
+EE 'lua_rawseti(L, VSindex, key)'
+Does the equivalent of t[key] = v, where t is the table 
+at the given valid index and v is the value at the top of the stack.
+
+EE lua状态
+不同的lua状态完全独立，不会相互影响。两个状态之间不能
+直接通信
+
+EE lua_State* lua_newstate (lua_Alloc f, void *ud);
+Creates a new thread running in a new, independent state. 
+Returns NULL if cannot create the thread or the state 
+due to lack of memory). The argument f is the allocator
+function; Lua does all memory allocation for this state through
+this function. The second argument, ud, is an opaque pointer
+that Lua passes to the allocator in every call. 
+使用f来完成内存的分配和释放
+
+EE lua_Alloc 
+lua中分配内存的函数原型定义
+typedef void * (*lua_Alloc) 
+    (void *ud, //在调用lua_newstate是提供的ud
+     void *ptr,//指向分配的buff地址
+     size_t osize,//buff原始的大小
+     size_t nsize);//buff新的大小
+当nsize为0是就free ptr指向的buff，返回NULL
+
+EE lua_Alloc lua_getallocf(L, void **ud)
+    返回一内存分配函数
+
+EE void lua_setallocf(L, lua_Alloc f, void *ud)
+    SET内存分配函数
+
+EE luaL_newstate()
+    call lua_newstate, f is realloc
+只要创建了一个新的lua状态，lua就会自动在这个状态中创建一个
+新的线程。这个是主线程。不会被回收，直到用lua_close
+
+
+
+
+
+EE 注册表 ZCB
+是一个全局的table，只能被C访问
+所有C模块共享一个注册表
+使用string来作为key，不要使用数字，系统保留
+
+EE LUA_REGISTRYINDEX 
+访问注册表的伪索引
+获得注册表中的值
+lua_gettfield(L, LUA_REGISTRYINDEX, "var")
+和table的使用一样，主不过，index不是一个真正的VS
+中的table，而是一个指向注册表的index
+
+EE 'luaL_ref'
+???
+
+EE upvalue
+只在特定函数中可见的变量。每个upvalue 都可以保存一个
+lua值。创建一个函数时可以将任意数量的upvalue与这个
+函数关联. 使用伪索引访问upvalue.
+
+EE closure
+将C函数与upvalue的关联成为 closure
+使用同一个函数，可以创建多个closure.每个closure可以有
+不同的upvalue
+
+EE lua_pushcclosure(L, lua_CFunction fn, int n)
+把一个新的c closure push on VS.
+n 是upvalue 的数量， upvalue 已经push onto VS了
+在调用完成后会pop upvalues
+VS top -> 
+up3       closure
+up2
+up1
+当n为0时，就是创建了一个light C function，这种情况下不会
+发生内存错误
+
+EE lua_upvalueindex(n) 
+一个Mcaro生成一个upvalue的伪索引。
+#define lua_upvalueindex(i)	(LUA_REGISTRYINDEX - (i))
+e.g int v=lua_tointeger(L, lua_upvalueindex(1))
+    为此函数的第一个upvalue生成索引
+
+EE luaL_op*
+类似与luaL_check* 但是允许参数不存在，
+若不存在则返回一个指定的默认值
+
+EE void luaL_argcheck 
+(L, int cond, int arg, const char *extramsg);
+Checks whether cond is true. If not, 
+raises an error with a standard message. 
+e.g luaL_argcheck(L,0, -1, "vs 1 argcheck error")
+-1 只是在出错是标记与哪个index有关，对错只看cond
+
+Userdata 有两中
+1. lightuserdata
+    light Userdata 是一种表示C指针的值
+    是C中的分配的之lua中使用。
+    使用 lua_pushlightuserdata,将他放入VS.
+
+2. fulluserdata
+    使用 lua_newuserdata 创建
+    full Userdata 是在lua中分配内存，并又lua
+    管理的对象，允许直接从C中读写，分配的内存
+    没有任何类型，只有大小。通过强转地址指针
+    来使用。就像malloc一样
+
+特点：
+1.两个fulluserdata 用相同的值构造，但是他们并不
+相同，因为地址不一阳。 两个 lightuserdata 只用值一样他们就一样，因为比较的是值.
+2. lightuserdata 只是一个指针值，就像数字一样，不需要
+垃圾回收管理。使用lightuserdata时用户必须自己完全管理
+内存。
+3.所有的lightuserdata 共享一个metatable,
+    __eq metamethod 对lightuserdata 没有效果。
+
+EE 为每一个userdata创建一个元表，来标记他。这样可以检测，
+一个指针, lua代码不能改变userdata的元表。
+是否为lua的userdata。
+
+EE void *lua_touserdata(L, int index)
+    如果给定的index是一个full userdata，返回地址，
+    如果是一个lightuserdata，返回指针，其他返回NULL
+
+EE luaL_newmetatable
+int luaL_newmetatable (L, const char *tname);
+1.If the registry already has the key tname, returns 0.
+2.Otherwise, creates a new table to be used as a
+    metatable for userdata, adds it to the registry 
+    with key tname, and returns 1.
+3 In both cases pushes onto the stack the final value 
+associated with tname in the registry. 
+
+EE luaL_getmetatable(L, const char *tname)
+    pushes onto the stack the metatable associated with
+    name tname in the registry
+
+EE void* luaL_checkudata(L, int index, const char *tname)
+    检测VS上index 位置上是否有一个userdata，并且具有
+    与索引tname相同的元表
+
+EE int luaL_checkint(L, int index)
+    检测VS上是index是否是一个int，然后转换成int
+
+EE int lua_next(L, index)
+    返回VS中index指向的table的指定key的下一个elem的key和value。
+    把会弹出old-key，压如next-key,next-value,如果没有下一个elem
+    就返回0，什么也不压
+VS top   -->
+old-key    next-value
+           next-key
+注意：不要使用lua_tostring来转换key，
+在遍历一张表的时候，不要直接对 key 调用 lua_tolstring
+除非你知道这个 key 一定是一个字符串。 
+调用 lua_tolstring 有可能改变给定索引位置的值； 
+这会对下一次调用 lua_next 造成影响。
+所以复制一个key到栈顶先 
