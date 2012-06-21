@@ -711,6 +711,7 @@ EE
 Returns the type of the value in the given acceptable index,
 or LUA_TNONE for a non-valid index. 
 The types returned by lua_type are defined in lua.h: 
+下面这些都是数字,是给lua_typename 用的
 LUA_TNIL, 
 LUA_TNUMBER, 
 LUA_TBOOLEAN,
@@ -720,6 +721,10 @@ LUA_TFUNCTION,
 LUA_TUSERDATA,
 LUA_TTHREAD,
 LUA_TLIGHTUSERDATA.
+
+lua交互类型可以从过config.h 配至
+EE lua_Number  == double
+   lua_Interger == ptrdiff_t
 
 EE 'lua_typename(L, int tp)
 return const char *
@@ -938,22 +943,26 @@ registration.
 ** function gets the 'nup' elements at the top as upvalues.
 ** Returns with only the table at the stack.
 
-
 每一个C模块编译成连接库，
 在lua中require “modename”
 没个C模块中都需要一个名为luaopen_modename 的函数。
 在lua require 一个C 模块后会自动执行 luaopen_modename
 的函数，在该函数中，需要注册此模块的函数
 .e.g. //file stacklook.so
-int luaopen_stacklook(lua_State *L)
+
+int luaopen_cbind(lua_State *L)
 {
     static const luaL_Reg Map[] = {
 	{"StackLook", StackLook},
 	{NULL, NULL}
     };
+    lua_newtable(L); 
+    //5.2中没有luaL_register 使用luaL_setfuncs,但是要先把一个table压入VS，然后，luaL_setfuncs就会
+    //把Map中所用的func存到table中
     luaL_setfuncs(L, Map, 0);
     return 1;
 }
+
 
 ////////////////// C/C++ call lua
 1当Lua调用C函数的时候，同样使用栈来交互。
@@ -1137,6 +1146,8 @@ Userdata 有两中
     管理的对象，允许直接从C中读写，分配的内存
     没有任何类型，只有大小。通过强转地址指针
     来使用。就像malloc一样
+    对fulluserdata 类型lua没有定义任何操作，
+    必须使用C接口注册元表，提供lua中的操作
 
 特点：
 1.两个fulluserdata 用相同的值构造，但是他们并不

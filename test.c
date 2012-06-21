@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "luahead.h"
+#include "showvs.h"
 
-#define	SHOW_VS(exp) exp; printf(#exp"\n"); stackDump(LS)			/*  */
-void stackDump(lua_State *L);
 //假设 table在top 
 int  getfield(lua_State *L, const char *key);
 void setfield(lua_State *l, const char *index, int value);
@@ -180,12 +179,12 @@ luaL_openlibs(LS);
      // 设置table
 #endif
 
-
-#if 0
+// EE use userdata
+#if 1
     lua_settop(LS,0);
     SHOW_VS(lua_pushlightuserdata(LS, 0));
     SHOW_VS(lua_setglobal(LS, "lightUD"));
-    dofile(LS, "test.lua");
+//    dofile(LS, "test.lua");
 
     typedef
     struct OO{
@@ -193,7 +192,6 @@ luaL_openlibs(LS);
 	double db;
     }OO, *OOP;
 
-// EE use userdata
     lua_settop(LS, 0);
     OOP ud=lua_newuserdata(LS, sizeof(struct OO));
     stackDump(LS);
@@ -205,15 +203,14 @@ luaL_openlibs(LS);
     else
 	printf ( "top vS userdata adress:%p\n", lua_touserdata(LS, -1) );
     ud=0;
-    lua_setglobal(LS, "cud");
-    stackDump(LS);
-    stackDump(LS);
+    SHOW_VS(lua_setglobal(LS, "cud"));
+    //在lua中设置ud的member:w
     dofile(LS, "test.lua");
 
 #endif
 
 //使用注册表 
-#if 1
+#if 0
     SHOW_VS(lua_settop(LS, 0));
     //在注册表中压如一个值3
     SHOW_VS(lua_pushinteger(LS, 3));
@@ -232,39 +229,6 @@ luaL_openlibs(LS);
     return 0 ;
 }
 
-
-
-//a func that show a virtual stack info top to down
-
-void stackDump(lua_State *L)
-{
-    int i;
-    int top = lua_gettop(L);
-    printf("VS: ");
-    if (top == 0) {
-	printf("empty\n");
-	return ;
-    }
-    for (i=1; i <= top; ++i) {
-	int t = lua_type(L, i) ;
-	switch (t) {
-	case LUA_TNUMBER: 
-	    printf("%g", lua_tonumber(L, i));
-	    break;
-	case LUA_TBOOLEAN:
-	    printf(lua_toboolean(L, i) ? "true" : "false");
-	    break;
-	case LUA_TSTRING: 
-	    printf("'%s'", lua_tostring(L, i));
-	    break;
-	default:
-	    printf("%s", lua_typename(L, t));
-		break;
-	}
-	printf ( " " );
-    }
-    printf ( "\n" );
-}
 
 //get table field
 int  getfield(lua_State *L, const char *key)
