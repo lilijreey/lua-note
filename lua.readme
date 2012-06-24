@@ -742,6 +742,12 @@ tp 的类型名， tp必须是lua_type 的返回值
 
 4.lua 不会持有外部的指针，push进来的值都会有一个lua的本地copy
 
+5. 帮顶lua有多种策略，lightuserdata fulluserdata and table
+
+6. 凡是要注册到lua的函数都要是CFunc 类型，在c++中需要用
+extern "C" 标明是c链接，用不然c++编译后会改动函数名称。到之
+lua看不见注册的函数。
+
 lua 提供了大量的操作VS的C 函数。来支持lua与其他语言
 的交互。
 index 1 是最先push进去的值，在stack bot。
@@ -755,6 +761,12 @@ EE 调用lua scripts 从C中
 EE
 typedef int (*lua_CFunction) (lua_State *L)
 这个既可以导出一个函数，被lua调用
+return value 是从VS中返回给lua的值的个数，
+lua会忽略VS中其他的值
+e.g ...
+lua_pushint(L,3) //first 
+lua_pushint(L,1) //second
+    retutn 2;
 
 EE
 lua_is*(lua_State *, index)
@@ -1166,6 +1178,17 @@ EE void *lua_touserdata(L, int index)
     如果给定的index是一个full userdata，返回地址，
     如果是一个lightuserdata，返回指针，其他返回NULL
 
+EE int lua_getmetatable(L, index)
+    把指定VS中index的值的元表push on到VS中
+    如果指定的值没有元表在什么都不做，返回0
+    
+
+EE void lua_setmetatable(L, index)
+Pops a table from the stack and sets it as the 
+new metatable for the value at the given acceptable index
+VS top
+ mematable
+
 EE luaL_newmetatable
 int luaL_newmetatable (L, const char *tname);
 1.If the registry already has the key tname, returns 0.
@@ -1178,6 +1201,8 @@ associated with tname in the registry.
 EE luaL_getmetatable(L, const char *tname)
     pushes onto the stack the metatable associated with
     name tname in the registry
+    就是 lua_getfield(LS, LUA_REGISTRYINDEX, "tname"));
+    的一个宏
 
 EE void* luaL_checkudata(L, int index, const char *tname)
     检测VS上index 位置上是否有一个userdata，并且具有

@@ -167,20 +167,24 @@ luaL_openlibs(LS);
      lua_pushinteger(LS, 3);
      // 1 只是标记这个检测和谁有关
      luaL_argcheck(LS, 0, 1, "argcheck error");
-     // 设置userdata 元表
-    int x= luaL_newmetatable(LS, "llmm");
-     stackDump(LS);
-     printf("x=%d\n", x);
-     luaL_getmetatable(LS, "llmm");
-     stackDump(LS);
-     luaL_checkudata(LS, -1, "llmm");
-     stackDump(LS);
+#endif
 
-     // 设置table
+
+// 设置注册表中的 userdata 元表
+// 这里的设置并不和userdata有关系
+// 只是操作注册表里的内容
+#if 1
+    dofile(LS, "test.lua");
+    int x= luaL_newmetatable(LS, "llmm"); //llmm 在注册表中
+    stackDump(LS);
+    printf("x=%d\n", x);
+    SHOW_VS(luaL_getmetatable(LS, "llmm")); //其实就是下面的Macro
+    SHOW_VS(lua_getfield(LS, LUA_REGISTRYINDEX, "llmm"));
+
 #endif
 
 // EE use userdata
-#if 1
+#if 0
     lua_settop(LS,0);
     SHOW_VS(lua_pushlightuserdata(LS, 0));
     SHOW_VS(lua_setglobal(LS, "lightUD"));
@@ -211,13 +215,16 @@ luaL_openlibs(LS);
 
 //使用注册表 
 #if 0
+    dofile(LS, "test.lua");
     SHOW_VS(lua_settop(LS, 0));
     //在注册表中压如一个值3
     SHOW_VS(lua_pushinteger(LS, 3));
     SHOW_VS(lua_setfield(LS, LUA_REGISTRYINDEX, "value"));
 
     //得到注册表中的值
-    SHOW_VS(lua_getfield(LS, LUA_REGISTRYINDEX, "value"));
+//  SHOW_VS(lua_getfield(LS, LUA_REGISTRYINDEX, "value"));
+    SHOW_VS(luaL_getmetatable(LS, "value")); //same above. this is a Marco
+
     printf ( "Registry value:%d\n", luaL_checkinteger(LS,-1) );
     SHOW_VS(lua_pop(LS,1));
 

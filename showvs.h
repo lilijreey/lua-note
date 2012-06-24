@@ -8,8 +8,14 @@
 #include <stdlib.h>
 #include "luahead.h"
 
-#define	SHOW_VS(exp) exp; printf(#exp"\n"); stackDump(LS)
-#define	SHOW_VSL(exp) exp; printf(#exp"\n"); stackDump(L)
+#ifdef DEBUG
+    #define SHOW_VS(exp) exp; printf(#exp"\n"); stackDump(LS)
+    #define DEBUG_LOG(exp) exp;
+#else
+    #define SHOW_VSL(exp) exp; 
+    #define DEBUG_LOG(exp) 
+#endif
+
 #ifdef __cplusplus
     extern "C" {
 #endif

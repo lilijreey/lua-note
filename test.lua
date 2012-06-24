@@ -25,5 +25,7 @@
 -- light userdata
 --print("lightUD: " .. type(lightUD))
 
-print("cud: " .. type(cud))
-print(cud.i)
+--print("cud: " .. type(cud))
+--print(cud.i)
+
+print("lua script")
