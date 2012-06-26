@@ -28,8 +28,7 @@ ud.us_set_a(t,1) -- bad userdata type
 --use OO op userdata
 --set usedata metatable in lua
 --[[
-s1=ud.us_new()
-local sm=getmetatable(s1)
+sm=getmetatable(ud.us_new())
 sm.__index=sm;
 sm.us_set_a = ud.us_set_a
 sm.us_set_d = ud.us_set_d
@@ -37,6 +36,19 @@ sm.us_get_a = ud.us_get_a
 sm.us_get_d = ud.us_get_d
 ]]
 
+--show userdata metatable
+function showmatatable(t)
+    local sm=getmetatable(t)
+    if sm == nil then
+	print("no metatable")
+    else
+	for _, v in pairs(sm) do
+	    print(_, v)
+	end
+    end
+end
+
+s1=ud.us_new()
 s1:us_get_d()
 s1:us_set_d(333)
 print(s1:us_get_d())

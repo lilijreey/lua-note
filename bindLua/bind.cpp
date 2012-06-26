@@ -64,6 +64,13 @@ static int us_new(lua_State *L)
     return 1; //return the pushed userdata
 }
 
+static int us_free(lua_State *L)
+{
+    US *us = (US*)luaL_checkudata(L, 1, "US");
+    us->~US();
+    return 0;
+}
+
 static int us_get_a(lua_State *L)
 {
     //check argument is user data
@@ -119,22 +126,36 @@ static int us_set_d(lua_State *L)
 extern "C"
 int luaopen_bind(lua_State *L)
 {
-    //1 为新的fulluserdata 注册元表
-    luaL_newmetatable(L, "US");
-    //
+    //2 把功能函数都注册到userdata的元表里
+    //只把构造函数注册的lua中
     static const luaL_Reg Map[] = {
 	{"us_new", us_new},
-	{"us_get_a", us_get_a},
-	{"us_get_d", us_get_d},
-	{"us_set_a", us_set_a},
-	{"us_set_d", us_set_d},
 	{"ot_new", ot_new},
 	{NULL, NULL}
     };
 
-    lua_newtable(L); 
+    static const luaL_Reg memFunc[] = {
+	{"us_get_a", us_get_a},
+	{"us_get_d", us_get_d},
+	{"us_set_a", us_set_a},
+	{"us_set_d", us_set_d},
+	{"__gc", us_free},
+	{NULL, NULL}
+    };
+
     //5.2中没有luaL_register 使用luaL_setfuncs,但是要先把一个table压入VS，然后，luaL_setfuncs就会
-    //把Map中所用的func存到table中
+    
+    // 在regisry中创建一个元表，为userdata的检测做准备
+    SHOW_VSL(luaL_newmetatable(L, "US"));
+
+    // 把函数注册到元表里,支持OO操作
+    SHOW_VSL(luaL_setfuncs(L, memFunc, 0));
+    //设置mematable __index is self
+    SHOW_VSL(lua_pushvalue(L, -1));
+    SHOW_VSL(lua_setfield(L, -2, "__index"));
+
+    SHOW_VSL(lua_newtable(L)); 
+    //把Map中的函数导入lua
     luaL_setfuncs(L, Map, 0);
     return 1;
 }
