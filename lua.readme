@@ -1,16 +1,4 @@
-EE
-可见行：
-由于lua都之在run-time 
-So If a function reference a func A, it much
-can seeable the functionA.
-
-
-EE difference
-f ; f =function() print(type(f)) end
-f()
-$: function
-
-local  f =function() print(type(f)) end
+function() print(type(f)) end
 f()
 $: nil 
 
@@ -115,8 +103,7 @@ EE
 e.g
 print {}
 
-EE
-'oo' 
+EE OO
 给予table
 --[[
 --使用do可以形成一个作用于，可以使得func似有化
@@ -1169,6 +1156,8 @@ Userdata 有两中
 内存。
 3.所有的lightuserdata 共享一个metatable,
     __eq metamethod 对lightuserdata 没有效果。
+
+4.userdata 没有key，对他的索引会直接调用--index元方法
 
 EE 为每一个userdata创建一个元表，来标记他。这样可以检测，
 一个指针, lua代码不能改变userdata的元表。

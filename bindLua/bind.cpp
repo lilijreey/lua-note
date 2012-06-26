@@ -4,13 +4,45 @@
 
 #include <stdio.h>
 #include <lua.hpp>
+#include <new>
+#define DEBUG
 #include  "../showvs.h"
 
-//Fiset step use userdata
-#if 0
-class US {
+//use fulluserdata bind cpp object
+//use regisry metatable protected and indicte fulluserdata
+//   1.首先在注册借口的时候就把元表注册到registery。
+//   2.在创建新的userdata的时候，把元表和userdata关联。
+//   3.在使用其他借口的时候检测userdata合法性
+#if 1
 
+//a simple userdata use to test
+class OT {
+
+};
+
+static int ot_new(lua_State *L) 
+{
+    SHOW_VSL(lua_newuserdata(L,sizeof(OT)));
+    // set US metatable for every new userdata
+    luaL_getmetatable(L, "OT");
+    lua_setmetatable(L, -2);
+
+    return 1; //return the pushed userdata
+}
+
+class US {
 public: 
+    US(int x=0, double y=0.0) 
+	:a(x), d(y){}
+    ~US() { DEBUG_LOG( printf ( "Destruction US\n" )) }
+
+    int get_a() const {return a;}
+    double get_d() const {return d;}
+
+    void set_a(int x) {a = x;}
+    void set_d(double y) {d=y;}
+
+private:
     int a;
     double d;
 };
@@ -19,40 +51,54 @@ public:
 //create a newa US vairable push to L 
 static int us_new(lua_State *L) 
 {
-    SHOW_VSL(lua_newuserdata(L,sizeof(US)));
+    int x = luaL_optint(L, 1, 0);
+    double d = luaL_optnumber(L, 2, 0);
+
+    void *buf = lua_newuserdata(L,sizeof(US));
+    //placement new
+    new(buf) US(x,d);
+    // set US metatable for every new userdata
+    luaL_getmetatable(L, "US");
+    lua_setmetatable(L, -2);
+
     return 1; //return the pushed userdata
 }
 
 static int us_get_a(lua_State *L)
 {
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, -1);
+   // US *us = (US*)lua_touserdata(L, 1);
+
+    //使用luaL_checkudata 不但可以检测是否是userdata，而且
+    //是否有指定的元表
+    US *us = (US*)luaL_checkudata(L, 1, "US");
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
     SHOW_VSL(lua_settop(L,0)); //clear argument
-    SHOW_VSL(lua_pushinteger(L, us->a));
+    SHOW_VSL(lua_pushinteger(L, us->get_a()));
     return 1;
 }
 
 static int us_get_d(lua_State *L)
 {
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, -1);
+   // US *us = (US*)lua_touserdata(L, -1);
+    US *us = (US*)luaL_checkudata(L, 1, "US");
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
     SHOW_VSL(lua_settop(L,0)); //clear argument
-    SHOW_VSL(lua_pushnumber(L, us->d));
+    SHOW_VSL(lua_pushnumber(L, us->get_d()));
     return 1;
 }
 
 static int us_set_a(lua_State *L)
 {
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, 1);
-    // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
+    
+   // US *us = (US*)lua_touserdata(L, 1);
+    printf ( "luaL_checkudata begin\n" );
+    US *us = (US*)luaL_checkudata(L, 1, "US");
+    printf ( "luaL_checkudata over\n us%p" , us);
     int a = luaL_checkint(L,2);	
-    us->a=a;
+    us->set_a(a);
     printf ( "us_set_a a:%d\n", a);
     return 0;
 }
@@ -60,11 +106,10 @@ static int us_set_a(lua_State *L)
 static int us_set_d(lua_State *L)
 {
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, 1);
+    US *us = (US*)luaL_checkudata(L, 1, "US");
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
     double d = luaL_checknumber(L,2);	
-    us->d=d;
+    us->set_d(d);
     printf ( "us_set_d d:%f\n", d);
     return 0;
 }
@@ -74,12 +119,16 @@ static int us_set_d(lua_State *L)
 extern "C"
 int luaopen_bind(lua_State *L)
 {
+    //1 为新的fulluserdata 注册元表
+    luaL_newmetatable(L, "US");
+    //
     static const luaL_Reg Map[] = {
 	{"us_new", us_new},
 	{"us_get_a", us_get_a},
 	{"us_get_d", us_get_d},
 	{"us_set_a", us_set_a},
 	{"us_set_d", us_set_d},
+	{"ot_new", ot_new},
 	{NULL, NULL}
     };
 
@@ -93,7 +142,7 @@ int luaopen_bind(lua_State *L)
 
 // 使用使用lightuserdata 绑定c++对象
 // lua不会管理对象的生死，生成的对象要手动释放
-#if 1
+#if 0
 class US {
 public: 
     US(int x=0, double y=0.0) 
@@ -149,9 +198,9 @@ static int us_get_a(lua_State *L)
 {
     DEBUG_LOG(printf ( "---us_get_a\n" ))
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, -1);
+    US *us = (US*)lua_touserdata(L, 1);
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
+    SHOW_VSL(luaL_argcheck(L, us != NULL, 1, "not a userdata"));
     SHOW_VSL(lua_settop(L,0)); //clear argument
     SHOW_VSL(lua_pushinteger(L, us->get_a()));
     return 1;
@@ -161,9 +210,9 @@ static int us_get_d(lua_State *L)
 {
     DEBUG_LOG(printf ( "---us_get_d\n" ))
     //check argument is user data
-    US *us = (US*)lua_touserdata(L, -1);
+    US *us = (US*)lua_touserdata(L, 1);
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
+    SHOW_VSL(luaL_argcheck(L, us != NULL, 1, "not a userdata"));
     SHOW_VSL(lua_settop(L,0)); //clear argument
     SHOW_VSL(lua_pushnumber(L, us->get_d()));
     return 1;
@@ -175,7 +224,7 @@ static int us_set_a(lua_State *L)
     //check argument is user data
     US *us = (US*)lua_touserdata(L, 1);
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
+    SHOW_VSL(luaL_argcheck(L, us != NULL, 1, "not a userdata"));
     int a = luaL_checkint(L,2);	
     us->set_a(a);
     DEBUG_LOG(printf ( "us_set_a a:%d\n", a))
@@ -188,7 +237,7 @@ static int us_set_d(lua_State *L)
     //check argument is user data
     US *us = (US*)lua_touserdata(L, 1);
     // if not a userdata print error msg
-    SHOW_VSL(luaL_argcheck(L, us != NULL, -1, "not a userdata"));
+    SHOW_VSL(luaL_argcheck(L, us != NULL, 1, "not a userdata"));
     double d = luaL_checknumber(L,2);	
     us->set_d(d);
     DEBUG_LOG(printf ( "us_set_d d:%f\n", d))

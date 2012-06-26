@@ -9,7 +9,7 @@
 #include "luahead.h"
 
 #ifdef DEBUG
-    #define SHOW_VS(exp) exp; printf(#exp"\n"); stackDump(LS)
+    #define SHOW_VSL(exp) exp; printf(#exp"\n"); stackDump(L)
     #define DEBUG_LOG(exp) exp;
 #else
     #define SHOW_VSL(exp) exp; 
