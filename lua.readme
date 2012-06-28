@@ -713,6 +713,8 @@ lua交互类型可以从过config.h 配至
 EE lua_Number  == double
    lua_Interger == ptrdiff_t
 
+EE lua中的数学都是lua_number,lua_interger 也会转换成lua_number
+
 EE 'lua_typename(L, int tp)
 return const char *
 tp 的类型名， tp必须是lua_type 的返回值
