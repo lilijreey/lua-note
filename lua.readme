@@ -780,6 +780,9 @@ EE lua_tostring(lua_State *L, int index);
 eq lua_tolstring(L, index, NULL)
 
 EE 'lua_objlen' renamed lua_rawlen(L, index) in 5.2
+返回指定的索引处的值的长度。 对于 string ，那就是字符串的长度； 
+对于 table ，是取长度操作符 ('#') 的结果； 
+对于 userdata ，就是为其分配的内存块的尺寸； 对于其它值，为 0 。 
 
 EE
 luaL_check*(lua_State *L, int index)
@@ -918,6 +921,9 @@ pop a value(top) from VS and set a global name
 EE 'getglobal(L, const char *name);
 把lua中的指定name变量push on到VS 上
 如果没有这个值就会push nil
+在LUA_REGISTRYINDEX 为索引中取值
+ t = luaH_getint(reg, LUA_RIDX_GLOBALS);
+
 
 //////////////////lua call C/C++
 1调用的函数都必须是LuaCFunct

@@ -537,20 +537,6 @@ void lua_tinker::push(lua_State *L, lua_tinker::table ret)
 	lua_pushvalue(L, ret.m_obj->m_index);
 }
 
-/*---------------------------------------------------------------------------*/ 
-/* pop                                                                       */ 
-/*---------------------------------------------------------------------------*/ 
-template<>
-void lua_tinker::pop(lua_State *L)
-{
-	lua_pop(L, 1);
-}
-
-template<>	
-lua_tinker::table lua_tinker::pop(lua_State *L)
-{
-	return table(L, lua_gettop(L));
-}
 
 /*---------------------------------------------------------------------------*/ 
 /* Tinker Class Helper                                                       */ 
@@ -640,6 +626,9 @@ lua_tinker::table_obj::table_obj(lua_State* L, int index)
 	,m_index(index)
 	,m_ref(0)
 {
+    //need check index is points a  table
+    //if (1 != lua_istable(n_L, m_index) 
+    // perro(table_obj construct index not a table);
 	m_pointer = lua_topointer(m_L, m_index);
 }
 
@@ -662,6 +651,8 @@ void lua_tinker::table_obj::dec_ref()
 		delete this;
 }
 
+//这里不够严谨，要检查是否是table类型，对于userdata，lua_topointer也会返回一个
+//有效值
 bool lua_tinker::table_obj::validate()
 {
 	if(m_pointer != NULL)

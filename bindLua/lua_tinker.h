@@ -342,8 +342,17 @@ namespace lua_tinker
 	template<typename T>  
 	T pop(lua_State *L) { T t = read<T>(L, -1); lua_pop(L, 1); return t; }
 	
-	template<>	void	pop(lua_State *L);
-	template<>	table	pop(lua_State *L);
+	template<>
+	void lua_tinker::pop(lua_State *L)
+	{
+		lua_pop(L, 1);
+	}
+
+	template<>	
+	lua_tinker::table lua_tinker::pop(lua_State *L)
+	{
+		return table(L, lua_gettop(L));
+	}
 
 	// functor
 	template<typename RVal, typename T1=void, typename T2=void, typename T3=void, typename T4=void, typename T5=void, typename T6=void, typename T7=void, typename T8=void>
@@ -1212,16 +1221,19 @@ namespace lua_tinker
 	};
 
 	// Table Object on Stack
+	// lua VS 中table造作的c++封装类,通过table_obj就可以在VS中操作table
 	struct table_obj
 	{
+	        //取得VS中index指向的table的地址
 		table_obj(lua_State* L, int index);
 		~table_obj();
 
-		void inc_ref();
+		void inc_ref(); //引用计数，为Table包装器提供支持
 		void dec_ref();
 
-		bool validate();
+		bool validate(); //检测是否是一个table类型，或userdata，
 
+		//把table中key=index的value设为object 
 		template<typename T>
 		void set(int index, T object)
 		{
@@ -1233,7 +1245,8 @@ namespace lua_tinker
 			}
 		}
 
-		template<typename T>
+		//得到table 中制定index 的值,如果index 无效返回nil
+	    	template<typename T>
 		T get(int index)
 		{
 			if(validate())
@@ -1249,6 +1262,7 @@ namespace lua_tinker
 			return pop<T>(m_L);
 		}
 
+		//以string为key的set
 		template<typename T>
 		void set(const char* name, T object)
 		{
@@ -1260,6 +1274,7 @@ namespace lua_tinker
 			}
 		}
 
+		//以string为key的get
 		template<typename T>
 		T get(const char* name)
 		{
@@ -1276,7 +1291,9 @@ namespace lua_tinker
 			return pop<T>(m_L);
 		}
 
+		//common by evan [2012/7/2]
 		//add by szd [2010/04/06]
+		//在table中压如obj，不是用元方法
 		template <typename T>
 		void put(T object)
 		{
@@ -1287,6 +1304,7 @@ namespace lua_tinker
 			}
 		}
 
+		//得到table的大小，和#table的值相同
 		int size()
 		{
 			if (validate())
@@ -1301,6 +1319,7 @@ namespace lua_tinker
 			return pop<int>(m_L);
 		}
 
+		//去的一个table的value，不是用元方法
 		template <typename T>
 		T fetch(int index)
 		{
@@ -1318,10 +1337,10 @@ namespace lua_tinker
 			return pop<T>(m_L);
 		}
 
-		lua_State*		m_L;
-		int				m_index;
-		const void*		m_pointer;
-		int				m_ref;
+		lua_State*		m_L; //lua State
+		int				m_index; //table 在VS中的index
+		const void*		m_pointer; //基本没啥用
+		int				m_ref;//引用计数 
 	};
 
 	// Table Object Holder
