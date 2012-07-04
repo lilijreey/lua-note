@@ -9,3 +9,13 @@ print(..., package.loaded[...])
 local SS = "modle"
 print("modload end")
 return SS 
+function ee()
+	fesffef
+	fesfeffef
+	fesfef
+	fesf
+end
+
+if esf then
+	fesfefafesf
+end
