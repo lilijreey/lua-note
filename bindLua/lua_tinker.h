@@ -152,6 +152,7 @@ namespace lua_tinker
 		}
 	};
 
+    // 保存一个userdata,使用virtual 保证distroy 真正的对象
 	struct user
 	{
 		user(void* p) : m_p(p) {}
@@ -820,7 +821,7 @@ namespace lua_tinker
 		return 1; 
 	}
 
-	// destroyer
+	// destroyer call ~class
 	template<typename T>
 	int destroyer(lua_State *L) 
 	{ 
@@ -1122,19 +1123,23 @@ namespace lua_tinker
 	void push_meta(lua_State *L, const char* name);
 
 	// class init
+    // 每个class就是一个table __newindex __name __index 都是table
+    // key , class table 的metatabel ???
+    //
 	template<typename T>
 	void class_add(lua_State* L, const char* name) 
 	{ 
-		class_name<T>::name(name);
+		class_name<T>::name(name); //存入name 作用??
 
+        //下面的table的key
 		lua_pushstring(L, name);
-		lua_newtable(L);
 
-		lua_pushstring(L, "__name");
+		lua_newtable(L); //meta table -3 注册到LUA_GLOBALSINDEX)
+		lua_pushstring(L, "__name"); //注册name
 		lua_pushstring(L, name);
 		lua_rawset(L, -3);
 
-		lua_pushstring(L, "__index");
+		lua_pushstring(L, "__index"); 
 		lua_pushcclosure(L, meta_get, 0);
 		lua_rawset(L, -3);
 
@@ -1179,7 +1184,7 @@ namespace lua_tinker
 		lua_pop(L, 1);
 	}
 
-	// Tinker Class Functions
+	// Tinker Class Functions 在Lua中注册一个class
 	template<typename T, typename F>
 	void class_def(lua_State* L, const char* name, F func) 
 	{ 
@@ -1208,6 +1213,7 @@ namespace lua_tinker
 		lua_pop(L, 1);
 	}
 
+    //存入一个指定name,没有指定返回""
 	template<typename T>
 	struct class_name
 	{

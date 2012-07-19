@@ -611,7 +611,7 @@ int lua_tinker::meta_set(lua_State *L)
 	return 0;
 }
 
-/*---------------------------------------------------------------------------*/ 
+/*-----------得到class table 而不是meta?? ------------------------------------------------------------*/ 
 void lua_tinker::push_meta(lua_State *L, const char* name)
 {
 	lua_pushstring(L, name);
