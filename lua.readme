@@ -979,6 +979,16 @@ int luaopen_cbind(lua_State *L)
 使用dofile，dostirng，dobuffer
 
 EE dofile
+loadfile
+执行truck
+
+EE loadfile
+编译给定的文件
+
+EE luac 编译lua源文件
+一般可以当作简单的加密使用
+不能 requre一个编译过的文件，
+用dofile 代替
 
 EE C 模块
 Lua 调用CFunc 时并不依赖于函数名，包的位置或可就规则
