@@ -323,6 +323,9 @@ local patt ="%a+"
 print(string.match(str, patt, 2))
 print(string.find(str, patt, 2))
 print(string.find("mgc %^&*", "%^", 1, true ))
+返回匹配的字符串在text中的开始index和结束index
+[i,l] 只返回第一个匹配的
+找不到返回 nil
 
 Frmt="%10s\n"
 for _, name in ipairs({"Lynn", "Jeremy", "Sally"}) do
@@ -505,5 +508,12 @@ loadstring(bb)("xx")
 --print(string.rep("a", 3,"#"))
 print(_VERSION)
 
+function aaa()
+    if a then
+        print(nil)
+    end
+end
+
+aaa()
 
 --local f ; f =function() print(type(f)) end

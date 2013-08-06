@@ -189,6 +189,7 @@ deep copy , like c++
 
 
 //////////String function
+ 单双引号效果相同
 EE
 'string.lower'
 'string.upper'
