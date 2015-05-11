@@ -5,6 +5,10 @@
 --      CREATED:  05/25/2012 10:29:32 AM CST
 --------------------------------------------------------------------------------
 
+--5.2
+--所有的全局引用都会被转换为对_ENV table中var 的引用
+--也就是是 a=32 其实会被编译为 _ENV.a=32
+
 --可以修改upvalue
 function aa() 
     ok = 3
@@ -20,7 +24,11 @@ end
 print(_ENV);
 print(_G);
 
-_ENV=nil
+a=323
+if a == _ENV.a then
+    print("a == _ENV.a")
+end
+--_ENV=nil
 print("33333333333");
 for _, v  in pairs(_G) do
     print(_, v)

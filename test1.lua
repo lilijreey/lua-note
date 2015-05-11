@@ -104,6 +104,7 @@ x:Get();
 --[[
 --另一个使用self
 --只有table有self
+-self 是使用冒号调用时对第一个隐士参数的引用
 do 
     --T is only used as a container
     local T = {}
@@ -506,14 +507,26 @@ loadstring(bb)("xx")
 ]]
 
 --print(string.rep("a", 3,"#"))
-print(_VERSION)
+--print(_VERSION)
 
-function aaa()
-    if a then
-        print(nil)
-    end
+--function aaa()
+--    if a then
+--        print(nil)
+--    end
+--end
+
+--aaa()
+
+
+function test_call_chain()
+  local a= {a=3}
+  function a:s1()
+      print(self.a)
+      self.a = self.a+1
+      return self
+  end
+
+  a:s1():s1():s1()
 end
 
-aaa()
-
---local f ; f =function() print(type(f)) end
+test_call_chain()

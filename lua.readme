@@ -14,6 +14,9 @@ end
 
 config_name="ff.x"
 config_value=100
+ a.a = a["a"]
+
+  
 
 table = {name="Evan", age=20}
 EE 范性for， pairs 输出所有table中的 key-value pair
@@ -543,6 +546,31 @@ module(spaceName);
 由于module后无法访问_G,要使得可以访问_G使用
 module(spaceName, package.seeall);
 
+## Create a Module
+5.1 的方法不同
+  显示的使用　module(MOudelName, package.seeall)
+  已经不推荐使用，会污染全局
+
+5.2
+1. 创建一个文件
+写一个local tab
+
+2. 然后给这个　tab 添加member
+3. 最后返回这个local tab
+  e.g.
+   local mymodule = {}
+   function mymodule.foo()
+	    print("Hello World!")
+   end
+   return mymodule
+  use
+   mymodule = require "xx"## 使用require 引入一个模块
+   mymodule.foo()
+
+
+##Reload moudel
+  package.loaded.xx=nil
+  mymodule = require "xx"
 
 EE Metatable 
 Lua 中每一个value中都可以有Metatable
